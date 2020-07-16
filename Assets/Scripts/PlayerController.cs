@@ -54,6 +54,7 @@ public class PlayerController : MonoBehaviour
     {
 #if HAS_JUMP_IMPLEMENTED
         myRigidbody = GetComponent<Rigidbody>();
+        Destroy(gameObject, 5F);
 #endif
     }
 
