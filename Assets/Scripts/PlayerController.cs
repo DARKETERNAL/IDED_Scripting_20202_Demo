@@ -1,5 +1,5 @@
 ﻿#define HAS_JUMP_IMPLEMENTED
-#define HAS_SHOOT_IMPLEMENTED
+//#define HAS_SHOOT_IMPLEMENTED
 
 using UnityEngine;
 
