@@ -54,6 +54,8 @@ public class PlayerController : MonoBehaviour
     {
 #if HAS_JUMP_IMPLEMENTED
         myRigidbody = GetComponent<Rigidbody>();
+        //linea de prueba
+       
 #endif
     }
 
