@@ -53,7 +53,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
 #if HAS_JUMP_IMPLEMENTED
-        //myRigidbody = GetComponent<Rigidbody>();
+        myRigidbody = GetComponent<Rigidbody>();
 #endif
     }
 
