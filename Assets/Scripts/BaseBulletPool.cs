@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseBulletPool<T> : MonoBehaviour, IPool<Bullet>
+public abstract class BaseBulletPool : MonoBehaviour, IPool<Bullet>
 {
     [SerializeField]
     private int poolSize = 5;
