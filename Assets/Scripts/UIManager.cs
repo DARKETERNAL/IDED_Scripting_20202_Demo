@@ -10,6 +10,7 @@ public class UIManager : Observer
 
     public override void NotifyHit()
     {
+        HitCounter.onWallHit -= NotifyHit;
         count += 1;
         UpdateCount();
     }
@@ -25,6 +26,7 @@ public class UIManager : Observer
     // Start is called before the first frame update
     private void Start()
     {
+        HitCounter.onWallHit += NotifyHit;
         UpdateCount();
     }
 
@@ -33,15 +35,13 @@ public class UIManager : Observer
         print("Anything");
     }
 
-    public override void Register(HitCounter hitCounter)
+    public override void Register()
     {
-        hitCounter.onWallHit += NotifyHit;
-        hitCounter.onWallHit += PrintAnything;
+        HitCounter.onWallHit += NotifyHit;
     }
 
-    public override void Unregister(HitCounter hitCounter)
+    public override void Unregister()
     {
-        hitCounter.onWallHit -= NotifyHit;
-        hitCounter.onWallHit -= PrintAnything;
+        HitCounter.onWallHit -= NotifyHit;
     }
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Runtime.ExceptionServices;
+using UnityEngine;
 
 public class HitCounter : MonoBehaviour
 {
@@ -6,7 +7,7 @@ public class HitCounter : MonoBehaviour
 
     public delegate void OnWallHit();
 
-    public event OnWallHit onWallHit;
+    public static event OnWallHit onWallHit;
 
     [SerializeField]
     private Observer[] observers;
@@ -17,14 +18,15 @@ public class HitCounter : MonoBehaviour
 
     private void Start()
     {
-        RegisterObservers();
+        //RegisterObservers();
+        hasRegisteredObservers = true;
     }
 
     private void RegisterObservers()
     {
         foreach (Observer observer in observers)
         {
-            observer.Register(this);
+            observer.Register();
         }
 
         hasRegisteredObservers = true;
@@ -36,7 +38,7 @@ public class HitCounter : MonoBehaviour
 
         foreach (Observer observer in observers)
         {
-            observer.Unregister(this);
+            observer.Unregister();
         }
     }
 
@@ -52,8 +54,9 @@ public class HitCounter : MonoBehaviour
                 if (currentHitsNotified == HITS_TO_NOTIFY)
                 {
                     currentHitsNotified = 0;
-                    UnregisterObservers();
-                } 
+                    onWallHit = null;
+                    //UnregisterObservers();
+                }
             }
 
             Destroy(collision.gameObject);
