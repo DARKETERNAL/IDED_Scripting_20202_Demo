@@ -26,7 +26,7 @@ public class Bullet : MonoBehaviour
         Invoke("DisableBullet", autoDestroyTime);
     }
 
-    private void DisableBullet()
+    protected virtual void DisableBullet()
     {
         Rb.velocity = Vector3.zero;
         BulletPool.Instance.Recycle(this);
