@@ -26,6 +26,8 @@ public class PlayerController : MonoBehaviour
 
     private int jumpCount;
 
+    private ShootCommand shootCommand;
+
     public static PlayerController Instance { get => instance; }
 
     private void Awake()
@@ -42,6 +44,8 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         myRigidbody = GetComponent<Rigidbody>();
+
+        shootCommand = new ShootCommand(spawnLocation, shootForce);
     }
 
     // Update is called once per frame
@@ -77,12 +81,9 @@ public class PlayerController : MonoBehaviour
 
         #region Shoot
 
-        if (Input.GetMouseButtonDown(0) && spawnLocation != null)
+        if (Input.GetButtonUp("Fire1") && spawnLocation != null)
         {
-            Rigidbody bulletClone = BulletPool.Instance.GetObject().Rb;
-            bulletClone.transform.position = spawnLocation.position;
-            bulletClone.transform.rotation = spawnLocation.rotation;
-            bulletClone.AddForce(spawnLocation.forward * shootForce, ForceMode.Impulse);
+            shootCommand.Execute();
         }
 
         #endregion Shoot

@@ -23,6 +23,10 @@ public class BulletPool : MonoBehaviour, IPool<Bullet>
         }
 
         instance = this;
+    }
+
+    private void Start()
+    {
         Fill();
     }
 
