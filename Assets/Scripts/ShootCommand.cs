@@ -2,8 +2,8 @@
 
 public class ShootCommand : ICommand
 {
-    private Transform spawnLocation;
-    private float shootForce;
+    protected Transform spawnLocation;
+    protected float shootForce;
 
     public ShootCommand(Transform spawnLocation, float shootForce)
     {
@@ -11,9 +11,14 @@ public class ShootCommand : ICommand
         this.shootForce = shootForce;
     }
 
+    protected virtual Rigidbody GetBullet()
+    {
+        return BulletPool.Instance.GetObject().Rb;
+    }
+
     public void Execute()
     {
-        Rigidbody bulletClone = BulletPool.Instance.GetObject().Rb;
+        Rigidbody bulletClone = GetBullet();
         bulletClone.transform.position = spawnLocation.position;
         bulletClone.transform.rotation = spawnLocation.rotation;
         bulletClone.AddForce(spawnLocation.forward * shootForce, ForceMode.Impulse);
