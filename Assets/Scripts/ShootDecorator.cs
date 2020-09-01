@@ -1,27 +1,17 @@
 ﻿using UnityEngine;
 
-public class ShootDecorator : MonoBehaviour, IDecorator
+public class ShootDecorator : ShootDecoratorBase
 {
-    private float shootForce = 0;
-
     private int ammo = 20;
-
-    private ShootCommand shootCommand;
 
     public void Init(float shootForce)
     {
         this.shootForce = shootForce;
     }
 
-    // Start is called before the first frame update
-    private void Start()
+    public override void Execute()
     {
-        shootCommand = new ShootCommand(transform, shootForce);
-    }
-
-    public void Execute()
-    {
-        shootCommand.Execute();
+        base.Execute();
 
         ammo--;
 
