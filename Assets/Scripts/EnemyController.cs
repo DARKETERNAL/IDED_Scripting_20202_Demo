@@ -2,6 +2,8 @@
 
 public class EnemyController : MonoBehaviour
 {
+    public const float SM_EXECUTE_RATE = 1F;
+
     [Header("State distances")]
     [SerializeField]
     private float warningDistance = 50F;
@@ -19,62 +21,28 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private float shootForce = 20F;
 
-    private ShootCommand shootCommand;
+    private EnemyStateMachine stateMachine;
 
-    private IState idleState;
-    private IState warningState;
-    private IState attackState;
-
-    private IState currentState;
-    private float distanceToPlayer;
-
-    public ShootCommand ShootCommand { get => shootCommand; }
-    public float TimeToShoot { get => timeToShoot; private set => timeToShoot = value; }
+    public float TimeToShoot { get => timeToShoot; }
+    public float WarningDistance { get => warningDistance; }
+    public float AttackDistance { get => attackDistance; }
+    public Transform SpawnLocation { get => spawnLocation; }
+    public float ShootForce { get => shootForce; }
 
     private void Start()
     {
-        shootCommand = new FastShootCommand(spawnLocation, shootForce);
-
-        idleState = new IdleState();
-        warningState = new WarningState(gameObject);
-        attackState = new AttackState(this);
-
-        currentState = idleState;
+        stateMachine = new EnemyStateMachine(this);
+        InvokeRepeating("ExecuteSM", 0F, SM_EXECUTE_RATE);
     }
 
-    private void ChangeState(IState newState)
+    private void ExecuteSM()
     {
-        currentState = newState;
-        currentState.Init();
+        stateMachine.Execute(Vector3.Distance(transform.position, PlayerController.Instance.transform.position));
     }
 
     // Update is called once per frame
-    private void Update()
-    {
-        distanceToPlayer = Vector3.Distance(transform.position, PlayerController.Instance.transform.position);
-
-        if (distanceToPlayer <= attackDistance)
-        {
-            if (currentState != attackState)
-            {
-                print("Changed to attack");
-                ChangeState(attackState);
-            }
-        }
-        else if (distanceToPlayer <= warningDistance)
-        {
-            if (currentState != warningState)
-            {
-                print("Changed to warning");
-                ChangeState(warningState);
-            }
-        }
-        else if (currentState != idleState)
-        {
-            print("Changed to idle");
-            ChangeState(idleState);
-        }
-
-        currentState.Execute();
-    }
+    //private void Update()
+    //{
+    //    stateMachine.Execute(Vector3.Distance(transform.position, PlayerController.Instance.transform.position));
+    //}
 }
