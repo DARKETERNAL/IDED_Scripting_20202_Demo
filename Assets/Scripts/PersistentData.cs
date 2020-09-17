@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
@@ -10,26 +9,22 @@ public class PersistentData : MonoBehaviour
     [Serializable]
     private class EnemyDataCollection
     {
-        public EnemyData[] enemyData;
+        [SerializeField]
+        private List<EnemyData> enemyData;
 
-        private List<EnemyData> enemyDataList;
-
-        public List<EnemyData> EnemyDataList { get => enemyDataList; private set => enemyDataList = value; }
+        public List<EnemyData> EnemyData { get => enemyData; private set => enemyData = value; }
 
         public void Init()
         {
             if (enemyData == null)
             {
-                enemyData = new EnemyData[] { };
+                EnemyData = new List<EnemyData>();
             }
-
-            EnemyDataList = enemyData.ToList();
         }
 
         public void AddEnemyData(EnemyData item)
         {
-            EnemyDataList.Add(item);
-            enemyData = EnemyDataList.ToArray();
+            EnemyData.Add(item);
         }
 
         public bool IsEnemyDead(string key)
@@ -38,9 +33,9 @@ public class PersistentData : MonoBehaviour
 
             foreach (EnemyData item in enemyData)
             {
-                if (item.enemyKey.Equals(key))
+                if (item.EnemyKey.Equals(key))
                 {
-                    result = item.isDead;
+                    result = item.IsDead;
                     break;
                 }
             }
@@ -52,17 +47,23 @@ public class PersistentData : MonoBehaviour
     [Serializable]
     public struct EnemyData
     {
-        public string enemyKey;
-        public bool isDead;
+        [SerializeField]
+        private string enemyKey;
+
+        [SerializeField]
+        private bool isDead;
 
         public EnemyData(string key, bool isDead)
         {
             enemyKey = key;
             this.isDead = isDead;
         }
+
+        public string EnemyKey { get => enemyKey; }
+        public bool IsDead { get => isDead; }
     }
 
-    private readonly string filePath = Path.Combine(Application.persistentDataPath, "enemyData.xxx");
+    private string filePath;
 
     private EnemyDataCollection enemyDataCol;
 
@@ -70,6 +71,8 @@ public class PersistentData : MonoBehaviour
 
     private void Awake()
     {
+        filePath = Path.Combine(Application.persistentDataPath, "enemyData.xxx");
+
         if (Instance == null)
         {
             Instance = this;
