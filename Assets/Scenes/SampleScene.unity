@@ -859,7 +859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 861182aab0b001d409c97990839f052d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 10
+  maxHP: 1
   enemyKey: 60a7642a-0a88-4052-a38e-7b1ba71340ez
   warningDistance: 50
   attackDistance: 25
@@ -974,7 +974,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 861182aab0b001d409c97990839f052d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 10
+  maxHP: 1
   enemyKey: 1234e757-601a-4e36-9ae0-81244b546445
   warningDistance: 50
   attackDistance: 25
@@ -1859,7 +1859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 861182aab0b001d409c97990839f052d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 10
+  maxHP: 1
   enemyKey: ce509f5a-8a56-44d1-890d-cb929f7e1e71
   warningDistance: 50
   attackDistance: 25
@@ -1898,7 +1898,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 861182aab0b001d409c97990839f052d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHP: 10
+  maxHP: 1
   enemyKey: dcdfe7b5-f3f4-4f64-b4fc-eddaa134e2dd
   warningDistance: 50
   attackDistance: 25
