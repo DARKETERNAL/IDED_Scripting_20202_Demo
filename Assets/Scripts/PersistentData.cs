@@ -1,7 +1,62 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class PersistentData : MonoBehaviour
 {
+    [Serializable]
+    public class EnemyDataCollection
+    {
+        public EnemyData[] enemyData;
+
+        private List<EnemyData> enemyDataList;
+
+        public List<EnemyData> EnemyDataList { get => enemyDataList; private set => enemyDataList = value; }
+
+        public void Init()
+        {
+            EnemyDataList = enemyData.ToList();
+        }
+
+        public void AddEnemyData(EnemyData item)
+        {
+            EnemyDataList.Add(item);
+            enemyData = EnemyDataList.ToArray();
+        }
+
+        public bool IsEnemyDead(string key)
+        {
+            bool result = false;
+
+            foreach (EnemyData item in enemyData)
+            {
+                if (item.enemyKey.Equals(key))
+                {
+                    result = item.isDead;
+                    break;
+                }
+            }
+
+            return result;
+        }
+    }
+
+    [Serializable]
+    public struct EnemyData
+    {
+        public string enemyKey;
+        public bool isDead;
+
+        public EnemyData(string key, bool isDead)
+        {
+            enemyKey = key;
+            this.isDead = isDead;
+        }
+    }
+
+    private EnemyDataCollection enemyDataCol;
+
     public static PersistentData Instance { get; private set; }
 
     private void Awake()
@@ -14,6 +69,18 @@ public class PersistentData : MonoBehaviour
         {
             Destroy(this);
         }
+
+        string serializedEnemyData = PlayerPrefs.GetString("EnemyData", string.Empty);
+        print(serializedEnemyData);
+
+        enemyDataCol = JsonUtility.FromJson<EnemyDataCollection>(serializedEnemyData);
+
+        if (enemyDataCol == null)
+        {
+            enemyDataCol = new EnemyDataCollection();
+        }
+
+        enemyDataCol.Init();
     }
 
     // Update is called once per frame
@@ -42,12 +109,21 @@ public class PersistentData : MonoBehaviour
     public void SaveEnemyDeath(string key)
     {
         print("Saving enemy death...");
-        PlayerPrefs.SetInt(key, 1);
+        enemyDataCol.AddEnemyData(new EnemyData(key, true));
+
+        string serializedEnemyData = JsonUtility.ToJson(enemyDataCol);
+        print(serializedEnemyData);
+
+        PlayerPrefs.SetString("EnemyData", serializedEnemyData);
+
+        //PlayerPrefs.SetInt(key, 1);
     }
 
     public bool LoadEnemyDeath(string key)
     {
         print("Loading enemy death...");
-        return PlayerPrefs.GetInt(key, 0) == 1;
+        return enemyDataCol.IsEnemyDead(key);
+
+        //return PlayerPrefs.GetInt(key, 0) == 1;
     }
 }
