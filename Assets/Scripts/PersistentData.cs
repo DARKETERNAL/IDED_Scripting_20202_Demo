@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 
 public class PersistentData : MonoBehaviour
@@ -16,6 +18,11 @@ public class PersistentData : MonoBehaviour
 
         public void Init()
         {
+            if (enemyData == null)
+            {
+                enemyData = new EnemyData[] { };
+            }
+
             EnemyDataList = enemyData.ToList();
         }
 
@@ -70,10 +77,12 @@ public class PersistentData : MonoBehaviour
             Destroy(this);
         }
 
-        string serializedEnemyData = PlayerPrefs.GetString("EnemyData", string.Empty);
-        print(serializedEnemyData);
+        //string serializedEnemyData = PlayerPrefs.GetString("EnemyData", string.Empty);
+        //print(serializedEnemyData);
 
-        enemyDataCol = JsonUtility.FromJson<EnemyDataCollection>(serializedEnemyData);
+        LoadEnemyDataInFile();
+
+        //enemyDataCol = JsonUtility.FromJson<EnemyDataCollection>(serializedEnemyData);
 
         if (enemyDataCol == null)
         {
@@ -111,10 +120,11 @@ public class PersistentData : MonoBehaviour
         print("Saving enemy death...");
         enemyDataCol.AddEnemyData(new EnemyData(key, true));
 
-        string serializedEnemyData = JsonUtility.ToJson(enemyDataCol);
-        print(serializedEnemyData);
+        //string serializedEnemyData = JsonUtility.ToJson(enemyDataCol);
+        //print(serializedEnemyData);
 
-        PlayerPrefs.SetString("EnemyData", serializedEnemyData);
+        SaveEnemyDataInFile();
+        //PlayerPrefs.SetString("EnemyData", serializedEnemyData);
 
         //PlayerPrefs.SetInt(key, 1);
     }
@@ -125,5 +135,30 @@ public class PersistentData : MonoBehaviour
         return enemyDataCol.IsEnemyDead(key);
 
         //return PlayerPrefs.GetInt(key, 0) == 1;
+    }
+
+    private void SaveEnemyDataInFile()
+    {
+        string filePath = Application.persistentDataPath + "/enemyData.txt";
+        print(filePath);
+
+        BinaryFormatter formatter = new BinaryFormatter();
+        FileStream file = File.Open(filePath, FileMode.OpenOrCreate);
+        formatter.Serialize(file, enemyDataCol);
+        file.Close();
+    }
+
+    private void LoadEnemyDataInFile()
+    {
+        string filePath = Application.persistentDataPath + "/enemyData.txt";
+        print(filePath);
+
+        if (File.Exists(filePath))
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream file = File.Open(filePath, FileMode.Open);
+            enemyDataCol = (EnemyDataCollection)formatter.Deserialize(file);
+            file.Close();
+        }
     }
 }
