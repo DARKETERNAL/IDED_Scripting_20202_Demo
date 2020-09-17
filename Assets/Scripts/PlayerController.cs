@@ -4,6 +4,12 @@ public class PlayerController : MonoBehaviour
 {
     private static PlayerController instance;
 
+    public delegate void OnTargetHit();
+    public delegate void OnDataLoaded();
+
+    public event OnTargetHit onTargetHit;
+    public event OnDataLoaded onDataLoaded;
+
     [SerializeField]
     private float movSpeed = 10F;
 
@@ -24,11 +30,10 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody myRigidbody;
 
-    private int jumpCount;
-
     private ShootCommand shootCommand;
 
     public static PlayerController Instance { get => instance; }
+    public int JumpCount { get; private set; }
 
     private void Awake()
     {
@@ -46,6 +51,13 @@ public class PlayerController : MonoBehaviour
         myRigidbody = GetComponent<Rigidbody>();
 
         shootCommand = new ShootCommand(spawnLocation, shootForce);
+
+        JumpCount = PersistentData.Instance.LoadHitCount();
+
+        if (onDataLoaded != null)
+        {
+            onDataLoaded();
+        }
     }
 
     // Update is called once per frame
@@ -71,9 +83,9 @@ public class PlayerController : MonoBehaviour
 
         #region Jump
 
-        if (Input.GetButtonUp("Jump") && myRigidbody != null && jumpCount < 2)
+        if (Input.GetButtonUp("Jump") && myRigidbody != null && JumpCount < 2)
         {
-            jumpCount += 1;
+            JumpCount += 1;
             myRigidbody.AddForce(transform.up * jumpForce, ForceMode.Impulse);
         }
 
@@ -91,11 +103,21 @@ public class PlayerController : MonoBehaviour
 
     #region JumpReset
 
+    public void UpdateScore()
+    {
+        JumpCount += 1;
+
+        if (onTargetHit != null)
+        {
+            onTargetHit();
+        }
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            jumpCount = 0;
+            //JumpCount = 0;
         }
     }
 

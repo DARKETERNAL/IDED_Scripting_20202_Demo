@@ -1,8 +1,16 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
     public const float SM_EXECUTE_RATE = 1F;
+
+    [Header("Params")]
+    [SerializeField]
+    private float maxHP;
+
+    [SerializeField]
+    private string enemyKey;
 
     [Header("State distances")]
     [SerializeField]
@@ -21,6 +29,10 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private float shootForce = 20F;
 
+    private float currentHP;
+
+    private Guid guid;
+
     private EnemyStateMachine stateMachine;
 
     public float TimeToShoot { get => timeToShoot; }
@@ -31,8 +43,26 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
-        stateMachine = new EnemyStateMachine(this);
-        InvokeRepeating("ExecuteSM", 0F, SM_EXECUTE_RATE);
+        if (PersistentData.Instance.LoadEnemyDeath(enemyKey))
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            currentHP = maxHP;
+            stateMachine = new EnemyStateMachine(this);
+            InvokeRepeating("ExecuteSM", 0F, SM_EXECUTE_RATE);
+        }
+    }
+
+    [ContextMenu("SetEnemyID")]
+    private void SetEnemyID()
+    {
+        if (!Guid.TryParse(enemyKey.ToString(), out guid))
+        {
+            guid = Guid.NewGuid();
+            enemyKey = guid.ToString();
+        }
     }
 
     private void ExecuteSM()
@@ -40,9 +70,22 @@ public class EnemyController : MonoBehaviour
         stateMachine.Execute(Vector3.Distance(transform.position, PlayerController.Instance.transform.position));
     }
 
-    // Update is called once per frame
-    //private void Update()
-    //{
-    //    stateMachine.Execute(Vector3.Distance(transform.position, PlayerController.Instance.transform.position));
-    //}
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.layer.Equals(LayerMask.NameToLayer("Bullet")))
+        {
+            currentHP -= 1;
+            PlayerController.Instance.UpdateScore();
+
+            if (currentHP <= 0)
+            {
+                if (!string.IsNullOrEmpty(enemyKey))
+                {
+                    PersistentData.Instance.SaveEnemyDeath(enemyKey);
+                }
+
+                Destroy(gameObject);
+            }
+        }
+    }
 }

@@ -6,12 +6,8 @@ public class UIManager : Observer
     [SerializeField]
     private Text label;
 
-    private int count;
-
     public override void NotifyHit()
     {
-        HitCounter.onWallHit -= NotifyHit;
-        count += 1;
         UpdateCount();
     }
 
@@ -19,29 +15,31 @@ public class UIManager : Observer
     {
         if (label != null)
         {
-            label.text = count.ToString();
+            label.text = PlayerController.Instance.JumpCount.ToString();
         }
     }
 
     // Start is called before the first frame update
     private void Start()
     {
-        HitCounter.onWallHit += NotifyHit;
+        Register();
         UpdateCount();
-    }
-
-    private void PrintAnything()
-    {
-        print("Anything");
     }
 
     public override void Register()
     {
-        HitCounter.onWallHit += NotifyHit;
+        PlayerController.Instance.onTargetHit += NotifyHit;
+        PlayerController.Instance.onDataLoaded += LoadData;
+    }
+
+    private void LoadData()
+    {
+        PlayerController.Instance.onDataLoaded -= LoadData;
+        UpdateCount();
     }
 
     public override void Unregister()
     {
-        HitCounter.onWallHit -= NotifyHit;
+        PlayerController.Instance.onTargetHit -= NotifyHit;
     }
 }
