@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class AttackState : IState
 {
@@ -22,8 +23,24 @@ public class AttackState : IState
 
         if (shootTimeElapsed >= owner.TimeToShoot)
         {
+            owner.StartCoroutine(PlayShootAnim());
+
             shootCommand.Execute();
             shootTimeElapsed = 0F;
+        }
+    }
+
+    private IEnumerator PlayShootAnim()
+    {
+        yield return null;
+
+        if (owner.AnimController != null)
+        {
+            owner.AnimController.SetBool("IsShooting", true);
+
+            yield return new WaitForEndOfFrame();
+
+            owner.AnimController.SetBool("IsShooting", false);
         }
     }
 

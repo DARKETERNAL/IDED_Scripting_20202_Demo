@@ -29,6 +29,13 @@ public class EnemyController : MonoBehaviour
     [SerializeField]
     private float shootForce = 20F;
 
+    [Header("Animation")]
+    [SerializeField]
+    private Animator animController;
+
+    [SerializeField]
+    private Renderer renderer;
+
     private float currentHP;
 
     private Guid guid;
@@ -40,6 +47,7 @@ public class EnemyController : MonoBehaviour
     public float AttackDistance { get => attackDistance; }
     public Transform SpawnLocation { get => spawnLocation; }
     public float ShootForce { get => shootForce; }
+    public Animator AnimController { get => animController; }
 
     private void Start()
     {
@@ -51,7 +59,11 @@ public class EnemyController : MonoBehaviour
         {
             currentHP = maxHP;
             stateMachine = new EnemyStateMachine(this);
-            InvokeRepeating("ExecuteSM", 0F, SM_EXECUTE_RATE);
+            //InvokeRepeating("ExecuteSM", 0F, SM_EXECUTE_RATE);
+            if (renderer != null)
+            {
+                InvokeRepeating("CheckDistanceToPlayer", 0F, SM_EXECUTE_RATE);
+            }
         }
     }
 
@@ -65,27 +77,47 @@ public class EnemyController : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        //transform.LookAt(PlayerController.Instance.transform);
+        //ExecuteSM();
+    }
+
+    private void CheckDistanceToPlayer()
+    {
+        renderer.enabled = Vector3.Distance(transform.position, PlayerController.Instance.transform.position) < 80F;
+
+        //if (Vector3.Distance(transform.position, PlayerController.Instance.transform.position) >= 150F)
+        //{
+        //    renderer.enabled = false;
+        //}
+        //else
+        //{
+        //    renderer.enabled = true;
+        //}
+    }
+
     private void ExecuteSM()
     {
         stateMachine.Execute(Vector3.Distance(transform.position, PlayerController.Instance.transform.position));
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.layer.Equals(LayerMask.NameToLayer("Bullet")))
-        {
-            currentHP -= 1;
-            PlayerController.Instance.UpdateScore();
+    //private void OnCollisionEnter(Collision collision)
+    //{
+    //    if (collision.gameObject.layer.Equals(LayerMask.NameToLayer("Bullet")))
+    //    {
+    //        currentHP -= 1;
+    //        PlayerController.Instance.UpdateScore();
 
-            if (currentHP <= 0)
-            {
-                if (!string.IsNullOrEmpty(enemyKey))
-                {
-                    PersistentData.Instance.SaveEnemyDeath(enemyKey);
-                }
+    //        if (currentHP <= 0)
+    //        {
+    //            if (!string.IsNullOrEmpty(enemyKey))
+    //            {
+    //                PersistentData.Instance.SaveEnemyDeath(enemyKey);
+    //            }
 
-                Destroy(gameObject);
-            }
-        }
-    }
+    //            Destroy(gameObject);
+    //        }
+    //    }
+    //}
 }

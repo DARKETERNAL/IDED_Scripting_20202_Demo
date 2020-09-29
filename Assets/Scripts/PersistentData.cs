@@ -117,6 +117,7 @@ public class PersistentData : MonoBehaviour
         {
             print("Deleting...");
             PlayerPrefs.DeleteAll();
+            File.Delete(filePath);
         }
     }
 
