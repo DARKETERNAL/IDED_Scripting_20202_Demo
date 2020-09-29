@@ -1,13 +1,16 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     private static PlayerController instance;
 
     public delegate void OnTargetHit();
+
     public delegate void OnDataLoaded();
 
     public event OnTargetHit onTargetHit;
+
     public event OnDataLoaded onDataLoaded;
 
     [SerializeField]
@@ -24,6 +27,9 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private float shootForce;
+
+    [SerializeField]
+    private Animator animController;
 
     private float hVal;
     private float vVal;
@@ -67,6 +73,11 @@ public class PlayerController : MonoBehaviour
 
         vVal = Input.GetAxis("Vertical"); //-1F..1F
 
+        if (animController != null)
+        {
+            animController.SetFloat("Speed", vVal);
+        }
+
         if (vVal != 0F)
         {
             transform.Translate(transform.forward * movSpeed * vVal * Time.deltaTime, Space.World);
@@ -96,9 +107,24 @@ public class PlayerController : MonoBehaviour
         if (Input.GetButtonUp("Fire1") && spawnLocation != null)
         {
             shootCommand.Execute();
+            StartCoroutine(ChangeShootAnim());
         }
 
         #endregion Shoot
+    }
+
+    private IEnumerator ChangeShootAnim()
+    {
+        yield return null;
+
+        if (animController != null)
+        {
+            animController.SetBool("IsShooting", true);
+
+            yield return new WaitForEndOfFrame();
+
+            animController.SetBool("IsShooting", false);
+        }
     }
 
     #region JumpReset
